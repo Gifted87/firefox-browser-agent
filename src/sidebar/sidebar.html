@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aetheria - Firefox ReAct Browser Agent</title>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Top Ambient Glows -->
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-indigo"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo-container">
+          <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>Aetheria</h1>
+          <span class="version-tag">ReAct v1.0</span>
+        </div>
+      </div>
+
+      <div class="agent-radar" id="agentRadar">
+        <span class="radar-dot"></span>
+        <span class="radar-label" id="agentStatusText">Idle</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-tab="tab-agent">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 8v4l3 3"/>
+        </svg>
+        <span>Agent</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-context">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <span>Context Hub</span>
+        <span class="badge-count" id="contextCountBadge">0</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-inspector">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <span>DOM</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-settings">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- Main Container -->
+    <main class="content-container">
+      
+      <!-- TAB 1: RE-ACT AGENT CONSOLE -->
+      <section id="tab-agent" class="tab-pane active">
+        
+        <!-- Live Task Header / Active Controls -->
+        <div class="task-control-bar">
+          <div class="active-tab-info" id="activeTabInfo">
+            <span class="status-indicator"></span>
+            <span class="tab-title-text" id="currentTabTitle">Detecting tab...</span>
+          </div>
+          <button class="btn-icon" id="btnRefreshTab" title="Refresh Active Tab State">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <polyline points="1 20 1 14 7 14"/>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Human in the Loop Alert Card (Hidden by default, shown during ask_user) -->
+        <div id="askUserCard" class="ask-user-card" style="display: none;">
+          <div class="ask-user-header">
+            <div class="pulse-ring"></div>
+            <span class="ask-user-title">Human Input Requested</span>
+          </div>
+          <p class="ask-user-question" id="askUserQuestionText">The agent needs your input.</p>
+          <div class="ask-user-options" id="askUserOptionsContainer">
+            <!-- Dynamic option chips -->
+          </div>
+          <div class="ask-user-input-group">
+            <input type="text" id="askUserCustomInput" placeholder="Type your response..." />
+            <button class="btn-send-answer" id="btnSubmitUserAnswer">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ReAct Execution Feed -->
+        <div class="execution-feed" id="executionFeed">
+          <div class="empty-state" id="feedEmptyState">
+            <div class="empty-icon-shield">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="m10 15 5-3-5-3v6z"/>
+              </svg>
+            </div>
+            <h3>Ready for Autonomous Tasks</h3>
+            <p>Instruct Aetheria to search jobs, apply with your resume, extract page content, or navigate multi-step web forms.</p>
+            
+            <div class="quick-prompts">
+              <button class="prompt-chip" data-prompt="Analyze this job posting, check if my profile matches, and fill out the application form with my resume.">
+                🎯 Apply to this job with resume
+              </button>
+              <button class="prompt-chip" data-prompt="Extract the key requirements, salary range, and company details from this page.">
+                📋 Extract job requirements & salary
+              </button>
+              <button class="prompt-chip" data-prompt="Find all search input fields on this page, type 'Senior Software Engineer', and submit.">
+                🔍 Search for job listings
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Input Box & Action Bar -->
+        <div class="input-action-bar">
+          <div class="textarea-wrapper">
+            <textarea 
+              id="taskInput" 
+              placeholder="What web task should Aetheria execute? (e.g. 'Fill out this application with my resume and ask me if anything is unclear')..." 
+              rows="2"
+            ></textarea>
+            
+            <div class="input-controls">
+              <div class="context-indicator" id="contextIndicator">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span id="activeResumeIndicator">No resume attached</span>
+              </div>
+
+              <div class="btn-group">
+                <button class="btn-stop" id="btnStopTask" style="display: none;">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="6" y="6" width="12" height="12" rx="2"/>
+                  </svg>
+                  Stop
+                </button>
+                <button class="btn-primary" id="btnStartTask">
+                  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  <span>Start Task</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- TAB 2: CONTEXT HUB (DOCUMENTS & PORTFOLIO CRAWLER) -->
+      <section id="tab-context" class="tab-pane">
+        
+        <!-- Section A: Portfolio Links & Domain Crawler -->
+        <div class="card-glass">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="2" y1="12" x2="22" y2="12"/>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Portfolio & Domain Ingestion</h3>
+              <p class="subtitle">Crawl your portfolio or personal website to extract all page content for the agent.</p>
+            </div>
+          </div>
+
+          <div class="crawler-input-row">
+            <input type="url" id="portfolioUrlInput" placeholder="https://yourportfolio.dev" />
+            <button class="btn-secondary" id="btnStartCrawl">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+              <span>Crawl Site</span>
+            </button>
+          </div>
+
+          <!-- Crawler Live Status Bar -->
+          <div id="crawlerStatusBar" class="crawler-status-bar" style="display: none;">
+            <div class="spinner-radar"></div>
+            <div class="crawler-status-info">
+              <span class="crawler-status-title" id="crawlerProgressTitle">Crawling domain...</span>
+              <span class="crawler-status-sub" id="crawlerProgressSub">Scanning internal links</span>
+            </div>
+          </div>
+
+          <!-- Discovered & Crawled Domains List -->
+          <div class="crawled-domains-list" id="crawledDomainsList">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Section B: Upload Documents & Resumes -->
+        <div class="card-glass">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Resumes & Knowledge Documents</h3>
+              <p class="subtitle">Upload PDF, DOCX, TXT, or JSON files. Set your default active resume for auto-applications.</p>
+            </div>
+          </div>
+
+          <div class="upload-dropzone" id="uploadDropzone">
+            <input type="file" id="fileInput" accept=".pdf,.txt,.md,.json,.csv" multiple style="display: none;" />
+            <div class="dropzone-content">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <p><strong>Click to upload</strong> or drag & drop files</p>
+              <span class="file-types-hint">PDF, TXT, Markdown, JSON (Max 5MB)</span>
+            </div>
+          </div>
+
+          <div class="document-list" id="documentList">
+            <!-- Dynamic uploaded doc cards -->
+          </div>
+        </div>
+
+        <!-- Section C: Master Profile Fields -->
+        <div class="card-glass">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Candidate Master Profile</h3>
+              <p class="subtitle">Key personal info used to automatically fill job application forms.</p>
+            </div>
+          </div>
+
+          <form id="profileForm" class="profile-grid">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="profFullName" placeholder="e.g. Alex Morgan" />
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="profEmail" placeholder="alex.morgan@example.com" />
+            </div>
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input type="tel" id="profPhone" placeholder="+1 (555) 234-5678" />
+            </div>
+            <div class="form-group">
+              <label>Location / City</label>
+              <input type="text" id="profLocation" placeholder="San Francisco, CA (or Remote)" />
+            </div>
+            <div class="form-group">
+              <label>LinkedIn URL</label>
+              <input type="url" id="profLinkedin" placeholder="https://linkedin.com/in/alexmorgan" />
+            </div>
+            <div class="form-group">
+              <label>GitHub URL</label>
+              <input type="url" id="profGithub" placeholder="https://github.com/alexmorgan" />
+            </div>
+            <div class="form-group">
+              <label>Current / Target Title</label>
+              <input type="text" id="profTitle" placeholder="Senior Full-Stack Engineer" />
+            </div>
+            <div class="form-group">
+              <label>Years of Experience</label>
+              <input type="number" id="profExperience" placeholder="5" min="0" />
+            </div>
+            <div class="form-group full-width">
+              <label>Core Skills & Technologies</label>
+              <input type="text" id="profSkills" placeholder="React, TypeScript, Node.js, Python, AWS, Docker" />
+            </div>
+            <div class="form-group full-width">
+              <label>Short Executive Bio</label>
+              <textarea id="profBio" rows="2" placeholder="Passionate software engineer specializing in scalable distributed web apps..."></textarea>
+            </div>
+            <div class="form-group full-width">
+              <button type="submit" class="btn-secondary" id="btnSaveProfile">
+                Save Profile
+              </button>
+            </div>
+          </form>
+        </div>
+
+      </section>
+
+      <!-- TAB 3: DOM INSPECTOR -->
+      <section id="tab-inspector" class="tab-pane">
+        <div class="card-glass">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                <polyline points="2 17 12 22 22 17"/>
+                <polyline points="2 12 12 17 22 12"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Page Element Visualizer</h3>
+              <p class="subtitle">Detect interactive elements on the current tab and inspect numeric badges.</p>
+            </div>
+          </div>
+
+          <div class="inspector-controls">
+            <button class="btn-primary" id="btnScanDom">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <span>Scan & Badge Page</span>
+            </button>
+            <button class="btn-secondary" id="btnClearDomBadges">
+              Clear Badges
+            </button>
+          </div>
+
+          <div class="dom-stats-row">
+            <div class="stat-box">
+              <span class="stat-num" id="statElementCount">0</span>
+              <span class="stat-label">Elements Found</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="statInputsCount">0</span>
+              <span class="stat-label">Form Inputs</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-num" id="statButtonsCount">0</span>
+              <span class="stat-label">Buttons</span>
+            </div>
+          </div>
+
+          <div class="elements-tree-view" id="elementsTreeView">
+            <div class="tree-empty-hint">Click "Scan & Badge Page" to view indexed elements.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: SETTINGS -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="card-glass">
+          <div class="card-header">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <div>
+              <h3>AI Model & Engine Configuration</h3>
+              <p class="subtitle">Choose your preferred LLM provider and configure API keys.</p>
+            </div>
+          </div>
+
+          <div class="settings-form">
+            <div class="form-group">
+              <label>LLM Provider</label>
+              <select id="settingsProvider">
+                <option value="self_hosted" selected>Self-Hosted Qwen (ngrok - No API Key)</option>
+                <option value="openrouter">OpenRouter</option>
+                <option value="gemini">Google Gemini</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic Claude</option>
+                <option value="ollama">Ollama / Local LLM</option>
+              </select>
+            </div>
+
+            <div class="form-group" id="apiKeyGroup">
+              <label>API Key</label>
+              <div class="input-password-wrapper">
+                <input type="password" id="settingsApiKey" placeholder="Enter API key (Not needed for self-hosted ngrok)..." />
+                <button class="btn-toggle-eye" id="btnToggleApiKey">👁️</button>
+              </div>
+              <span class="field-hint" id="apiKeyHint">No API key required when using Self-Hosted Qwen.</span>
+            </div>
+
+            <div class="form-group">
+              <label>Model Name</label>
+              <input type="text" id="settingsModel" value="Qwen/Qwen2.5-1.5B-Instruct" />
+              <div class="model-presets" id="modelPresets">
+                <button type="button" class="preset-pill" data-model="Qwen/Qwen2.5-1.5B-Instruct">Qwen/Qwen2.5-1.5B-Instruct</button>
+                <button type="button" class="preset-pill" data-model="nex-agi/nex-n2.5-mini:free">nex-n2.5-mini:free</button>
+                <button type="button" class="preset-pill" data-model="gemini-1.5-flash">gemini-1.5-flash</button>
+                <button type="button" class="preset-pill" data-model="gpt-4o-mini">gpt-4o-mini</button>
+              </div>
+            </div>
+
+            <div class="form-group" id="baseUrlGroup" style="display: none;">
+              <label>Custom Base URL / Endpoint</label>
+              <input type="url" id="settingsBaseUrl" placeholder="http://localhost:11434" />
+            </div>
+
+            <div class="form-group">
+              <label>Max Reasoning Steps per Task</label>
+              <input type="number" id="settingsMaxSteps" value="25" min="5" max="60" />
+            </div>
+
+            <button class="btn-primary" id="btnSaveSettings">
+              Save Settings
+            </button>
+          </div>
+
+          <!-- System Logs Stream -->
+          <div class="card-header" style="margin-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 24px;">
+            <div class="card-header-icon">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="4 17 10 11 4 5"/>
+                <line x1="12" y1="19" x2="20" y2="19"/>
+              </svg>
+            </div>
+            <div>
+              <h3>System Logs</h3>
+              <p class="subtitle">Live diagnostic stream from the Agent Core.</p>
+            </div>
+          </div>
+          <div class="system-logs-container" id="systemLogsContainer">
+            <!-- Logs will stream here -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script type="module" src="sidebar.js"></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apex Dynamics - Senior Full-Stack Engineer Application</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --border: #334155;
+      --primary: #6366f1;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 680px;
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    .job-header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid #4f46e5;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; }
+    .company-meta { color: var(--text-muted); font-size: 14px; margin-bottom: 16px; }
+    .job-desc { font-size: 13.5px; line-height: 1.6; color: #cbd5e1; margin-bottom: 20px; }
+    .job-desc ul { margin-left: 20px; margin-top: 8px; }
+    .form-section h2 { font-size: 18px; margin-bottom: 16px; color: #e2e8f0; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .full-width { grid-column: 1 / -1; }
+    label { font-size: 12.5px; font-weight: 500; color: var(--text-muted); }
+    input, select, textarea {
+      background: #090d16;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    .file-dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      background: rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover { opacity: 0.9; }
+    .success-banner {
+      display: none;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid #10b981;
+      color: #6ee7b7;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="job-header">
+      <span class="badge">Full-time • Remote (US / Europe)</span>
+      <h1>Senior Full-Stack Engineer</h1>
+      <div class="company-meta">Apex Dynamics • Engineering Team • $140,000 - $180,000 / yr</div>
+      <div class="job-desc">
+        <p>We are seeking a talented Senior Full-Stack Engineer to lead the architecture of our cloud microservices and reactive browser interfaces.</p>
+        <ul>
+          <li>Build resilient web services using TypeScript, React, and Node.js.</li>
+          <li>Collaborate with product designers to ship state-of-the-art user experiences.</li>
+          <li>Contribute to automated testing and continuous integration pipelines.</li>
+        </ul>
+      </div>
+    </div>
+
+    <form class="form-section" id="applicationForm" onsubmit="event.preventDefault(); document.getElementById('successBanner').style.display='block';">
+      <h2>Candidate Application</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input type="text" id="fullName" name="fullName" placeholder="e.g. Alex Morgan" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" name="email" placeholder="alex@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number *</label>
+          <input type="tel" id="phone" name="phone" placeholder="+1 (555) 019-2834" required />
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin">LinkedIn Profile URL</label>
+          <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username" />
+        </div>
+
+        <div class="form-group">
+          <label for="experience">Years of Relevant Experience</label>
+          <input type="number" id="experience" name="experience" placeholder="5" min="0" />
+        </div>
+
+        <div class="form-group">
+          <label for="workAuth">Work Authorization Status *</label>
+          <select id="workAuth" name="workAuth" required>
+            <option value="">Select authorization status...</option>
+            <option value="authorized">Authorized to work with no sponsorship required</option>
+            <option value="sponsorship_required">Require visa sponsorship</option>
+            <option value="other">Other / Contract</option>
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="resumeUpload">Attach Resume (PDF, DOCX) *</label>
+          <div class="file-dropzone">
+            <input type="file" id="resumeUpload" name="resume" accept=".pdf,.docx,.txt" required />
+          </div>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="coverLetter">Why are you a strong fit for Apex Dynamics?</label>
+          <textarea id="coverLetter" name="coverLetter" rows="4" placeholder="Briefly describe your past technical accomplishments..."></textarea>
+        </div>
+
+        <div class="form-group full-width">
+          <button type="submit" id="btnSubmitApp" class="btn-submit">Submit Application</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="success-banner" id="successBanner">
+      🎉 Application successfully submitted! Thank you for applying.
+    </div>
+  </div>
+</body>
+</html>
